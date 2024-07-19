@@ -25,6 +25,11 @@ const configVariables: ConfigVariables = {
       defaultValue: "true",
       secret: false,
     },
+    sessionDuration: {
+      type: "number",
+      defaultValue: "2160",
+      secret: false,
+    },
   },
   share: {
     allowRegistration: {
@@ -56,12 +61,16 @@ const configVariables: ConfigVariables = {
       defaultValue: "10000000",
       secret: false,
     },
+    autoOpenShareModal: {
+      type: "boolean",
+      defaultValue: "false",
+      secret: false,
+    },
   },
   email: {
     enableShareEmailRecipients: {
       type: "boolean",
       defaultValue: "false",
-
       secret: false,
     },
     shareRecipientsSubject: {
@@ -107,6 +116,12 @@ const configVariables: ConfigVariables = {
       defaultValue: "false",
       secret: false,
     },
+    allowUnauthorizedCertificates: {
+      type: "boolean",
+      defaultValue: "false",
+
+      secret: false,
+    },
     host: {
       type: "string",
       defaultValue: "",
@@ -137,6 +152,11 @@ const configVariables: ConfigVariables = {
     "ignoreTotp": {
       type: "boolean",
       defaultValue: "true",
+    },
+    "disablePassword": {
+      type: "boolean",
+      defaultValue: "false",
+      secret: false,
     },
     "github-enabled": {
       type: "boolean",
@@ -210,6 +230,18 @@ const configVariables: ConfigVariables = {
       type: "string",
       defaultValue: "",
     },
+    "oidc-rolePath": {
+      type: "string",
+      defaultValue: "",
+    },
+    "oidc-roleGeneralAccess": {
+      type: "string",
+      defaultValue: "",
+    },
+    "oidc-roleAdminAccess": {
+      type: "string",
+      defaultValue: "",
+    },
     "oidc-clientId": {
       type: "string",
       defaultValue: "",
@@ -219,7 +251,7 @@ const configVariables: ConfigVariables = {
       defaultValue: "",
       obscured: true,
     },
-  }
+  },
 };
 
 type ConfigVariables = {
@@ -271,12 +303,15 @@ async function seedConfigVariables() {
 
 async function migrateConfigVariables() {
   const existingConfigVariables = await prisma.config.findMany();
+  const orderMap: { [category: string]: number } = {};
 
   for (const existingConfigVariable of existingConfigVariables) {
     const configVariable =
       configVariables[existingConfigVariable.category]?.[
-      existingConfigVariable.name
+        existingConfigVariable.name
       ];
+
+    // Delete the config variable if it doesn't exist in the seed
     if (!configVariable) {
       await prisma.config.delete({
         where: {
@@ -287,15 +322,11 @@ async function migrateConfigVariables() {
         },
       });
 
-      // Update the config variable if the metadata changed
-    } else if (
-      JSON.stringify({
-        ...configVariable,
-        name: existingConfigVariable.name,
-        category: existingConfigVariable.category,
-        value: existingConfigVariable.value,
-      }) != JSON.stringify(existingConfigVariable)
-    ) {
+      // Update the config variable if it exists in the seed
+    } else {
+      const variableOrder = Object.keys(
+        configVariables[existingConfigVariable.category]
+      ).indexOf(existingConfigVariable.name);
       await prisma.config.update({
         where: {
           name_category: {
@@ -308,8 +339,10 @@ async function migrateConfigVariables() {
           name: existingConfigVariable.name,
           category: existingConfigVariable.category,
           value: existingConfigVariable.value,
+          order: variableOrder,
         },
       });
+      orderMap[existingConfigVariable.category] = variableOrder + 1;
     }
   }
 }

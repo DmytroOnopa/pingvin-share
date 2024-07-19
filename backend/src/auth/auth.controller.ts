@@ -37,15 +37,21 @@ export class AuthController {
   ) {}
 
   @Post("signUp")
-  @Throttle(10, 5 * 60)
+  @Throttle({
+    default: {
+      limit: 20,
+      ttl: 5 * 60,
+    },
+  })
   async signUp(
     @Body() dto: AuthRegisterDTO,
+    @Req() { ip }: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
     if (!this.config.get("share.allowRegistration"))
       throw new ForbiddenException("Registration is not allowed");
 
-    const result = await this.authService.signUp(dto);
+    const result = await this.authService.signUp(dto, ip);
 
     this.authService.addTokensToResponse(
       response,
@@ -57,13 +63,19 @@ export class AuthController {
   }
 
   @Post("signIn")
-  @Throttle(10, 5 * 60)
+  @Throttle({
+    default: {
+      limit: 20,
+      ttl: 5 * 60,
+    },
+  })
   @HttpCode(200)
   async signIn(
     @Body() dto: AuthSignInDTO,
+    @Req() { ip }: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.signIn(dto);
+    const result = await this.authService.signIn(dto, ip);
 
     if (result.accessToken && result.refreshToken) {
       this.authService.addTokensToResponse(
@@ -77,7 +89,12 @@ export class AuthController {
   }
 
   @Post("signIn/totp")
-  @Throttle(10, 5 * 60)
+  @Throttle({
+    default: {
+      limit: 20,
+      ttl: 5 * 60,
+    },
+  })
   @HttpCode(200)
   async signInTotp(
     @Body() dto: AuthSignInTotpDTO,
@@ -95,14 +112,24 @@ export class AuthController {
   }
 
   @Post("resetPassword/:email")
-  @Throttle(5, 5 * 60)
+  @Throttle({
+    default: {
+      limit: 20,
+      ttl: 5 * 60,
+    },
+  })
   @HttpCode(202)
   async requestResetPassword(@Param("email") email: string) {
     this.authService.requestResetPassword(email);
   }
 
   @Post("resetPassword")
-  @Throttle(5, 5 * 60)
+  @Throttle({
+    default: {
+      limit: 20,
+      ttl: 5 * 60,
+    },
+  })
   @HttpCode(204)
   async resetPassword(@Body() dto: ResetPasswordDTO) {
     return await this.authService.resetPassword(dto.token, dto.password);

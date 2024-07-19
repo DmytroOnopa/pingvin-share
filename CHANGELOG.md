@@ -1,3 +1,61 @@
+## [0.27.0](https://github.com/stonith404/pingvin-share/compare/v0.26.0...v0.27.0) (2024-07-11)
+
+
+### Features
+
+* add logs for successful registration, successful login and failed login ([d2bfb9a](https://github.com/stonith404/pingvin-share/commit/d2bfb9a55fdad6a05377b8552471cf1151304c90))
+* **auth:** Allow to hide username / password login form when OAuth is enabled ([#518](https://github.com/stonith404/pingvin-share/issues/518)) ([e1a68f7](https://github.com/stonith404/pingvin-share/commit/e1a68f75f7b034f1ef9e45f26de584f13e355589)), closes [#489](https://github.com/stonith404/pingvin-share/issues/489)
+* **smtp:** allow unauthorized mail server certificates ([#525](https://github.com/stonith404/pingvin-share/issues/525)) ([083d82c](https://github.com/stonith404/pingvin-share/commit/083d82c28b835c178f076e89ef8f5885e8ea31cb))
+
+## [0.26.0](https://github.com/stonith404/pingvin-share/compare/v0.25.0...v0.26.0) (2024-07-03)
+
+
+### Features
+
+* **backend:** Make session duration configurable ([#512](https://github.com/stonith404/pingvin-share/issues/512)) ([367f804](https://github.com/stonith404/pingvin-share/commit/367f804a494c85b4caf879d51982339fb6b86ba1)), closes [#507](https://github.com/stonith404/pingvin-share/issues/507)
+
+
+### Bug Fixes
+
+* **oauth:** provider username is ignored when signing up using OAuth ([#511](https://github.com/stonith404/pingvin-share/issues/511)) ([31366d9](https://github.com/stonith404/pingvin-share/commit/31366d961f5827c200038b65ec9de5d4ddc8b898)), closes [#505](https://github.com/stonith404/pingvin-share/issues/505)
+* set max age of access token cookie to 15 minutes ([2dac385](https://github.com/stonith404/pingvin-share/commit/2dac38560b6c54b6e7676dcd4682bfa57973292f))
+
+## [0.25.0](https://github.com/stonith404/pingvin-share/compare/v0.24.2...v0.25.0) (2024-06-10)
+
+
+### Features
+
+* add auto open share modal config for global. ([#474](https://github.com/stonith404/pingvin-share/issues/474)) ([4fd2903](https://github.com/stonith404/pingvin-share/commit/4fd29037a08dbe505bdd8cf20f6f114cbade8483))
+* **frontend:** locale for dates and tooltip for copy link button ([#492](https://github.com/stonith404/pingvin-share/issues/492)) ([1c7832a](https://github.com/stonith404/pingvin-share/commit/1c7832ad1fb445fd1dbe1c111be5a331eaa4b797))
+
+
+### Bug Fixes
+
+* share size not displayed on my shares page ([c0cc16f](https://github.com/stonith404/pingvin-share/commit/c0cc16fa430bc64afb024c19d5faf24456bd417c))
+
+## [0.24.2](https://github.com/stonith404/pingvin-share/compare/v0.24.1...v0.24.2) (2024-05-22)
+
+
+### Bug Fixes
+
+* admin couldn't delete shares created by anonymous users ([7afda85](https://github.com/stonith404/pingvin-share/commit/7afda85f03d410a6c611860d0c3fb2b88a2e3679))
+* whitespace in title on homepage ([74cd520](https://github.com/stonith404/pingvin-share/commit/74cd520cb8c4ea87822ab6d54c0bf010455f401b))
+
+## [0.24.1](https://github.com/stonith404/pingvin-share/compare/v0.24.0...v0.24.1) (2024-05-04)
+
+
+### Bug Fixes
+
+* error on admin share management page if a share was created by an anonymous user ([c999df1](https://github.com/stonith404/pingvin-share/commit/c999df15e04a927f6e952db3c807b9591fb14894))
+
+## [0.24.0](https://github.com/stonith404/pingvin-share/compare/v0.23.1...v0.24.0) (2024-05-04)
+
+
+### Features
+
+* add admin-exclusive share-management page ([#461](https://github.com/stonith404/pingvin-share/issues/461)) ([3b1c9f1](https://github.com/stonith404/pingvin-share/commit/3b1c9f1efb7d02469e92537a2d1378b6cb412878))
+* add name property to share ([#462](https://github.com/stonith404/pingvin-share/issues/462)) ([b717663](https://github.com/stonith404/pingvin-share/commit/b717663b5c3a4a98e361e7e39b680f4852537c59))
+
 ## [0.23.1](https://github.com/stonith404/pingvin-share/compare/v0.23.0...v0.23.1) (2024-04-05)
 
 

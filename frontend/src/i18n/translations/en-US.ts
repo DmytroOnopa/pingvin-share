@@ -44,6 +44,7 @@ export default {
   "signIn.notify.totp-required.description":
     "Please enter your two-factor authentication code",
   "signIn.oauth.or": "OR",
+  "signIn.oauth.signInWith": "Sign in with",
   "signIn.oauth.github": "GitHub",
   "signIn.oauth.google": "Google",
   "signIn.oauth.microsoft": "Microsoft",
@@ -122,7 +123,7 @@ export default {
   "account.modal.totp.step2": "Step 2: Validate your code",
   "account.modal.totp.enterManually": "Enter manually",
   "account.modal.totp.code": "Code",
-  "account.modal.totp.clickToCopy": "Click to copy",
+  "common.button.clickToCopy": "Click to copy",
   "account.modal.totp.verify": "Verify",
   "account.notify.totp.disable": "TOTP disabled successfully",
   "account.notify.totp.enable": "TOTP enabled successfully",
@@ -224,6 +225,7 @@ export default {
   // /admin
   "admin.title": "Administration",
   "admin.button.users": "User management",
+  "admin.button.shares": "Share management",
   "admin.button.config": "Configuration",
   "admin.version": "Version",
   // END /admin
@@ -259,6 +261,19 @@ export default {
     "If checked, the user will be able to access the admin panel.",
 
   // END /admin/users
+
+  // /admin/shares
+  "admin.shares.title": "Share management",
+  "admin.shares.table.id": "Share ID",
+  "admin.shares.table.username": "Creator",
+  "admin.shares.table.visitors": "Visitors",
+  "admin.shares.table.expires": "Expires At",
+
+  "admin.shares.edit.delete.title": "Delete share {id}",
+  "admin.shares.edit.delete.description":
+    "Do you really want to delete this share?",
+
+  // END /admin/shares
 
   // /upload
   "upload.title": "Upload",
@@ -307,8 +322,9 @@ export default {
   "upload.modal.expires.year-singular": "Year",
   "upload.modal.expires.year-plural": "Years",
 
-  "upload.modal.accordion.description.title": "Description",
-  "upload.modal.accordion.description.placeholder":
+  "upload.modal.accordion.name-and-description.title": "Name and description",
+  "upload.modal.accordion.name-and-description.name.placeholder": "Name",
+  "upload.modal.accordion.name-and-description.description.placeholder":
     "Note for the recipients of this share",
 
   "upload.modal.accordion.email.title": "Email recipients",
@@ -384,6 +400,9 @@ export default {
   "admin.config.general.show-home-page": "Show home page",
   "admin.config.general.show-home-page.description":
     "Whether to show the home page",
+  "admin.config.general.session-duration": "Session Duration",
+  "admin.config.general.session-duration.description":
+    "Time in hours after which a user must log in again (default: 3 months).",
   "admin.config.general.logo": "Logo",
   "admin.config.general.logo.description":
     "Change your logo by uploading a new image. The image must be a PNG and should have the format 1:1.",
@@ -417,6 +436,7 @@ export default {
   "admin.config.email.invite-message": "Invite message",
   "admin.config.email.invite-message.description":
     "Message which gets sent when an admin invites a user. {url} will be replaced with the invite URL and {password} with the password.",
+
   "admin.config.share.allow-registration": "Allow registration",
   "admin.config.share.allow-registration.description":
     "Whether registration is allowed",
@@ -433,8 +453,12 @@ export default {
   "admin.config.share.zip-compression-level.description":
     "Adjust the level to balance between file size and compression speed. Valid values range from 0 to 9, with 0 being no compression and 9 being maximum compression. ",
   "admin.config.share.chunk-size": "Chunk size",
-  "admin.config.share.chunk-size.description": "Adjust the chunk size (in bytes) for your uploads to balance efficiency and reliability according to your internet connection. Smaller chunks can enhance success rates for unstable connections, while larger chunks speed up uploads for stable connections.",
-  
+  "admin.config.share.chunk-size.description":
+    "Adjust the chunk size (in bytes) for your uploads to balance efficiency and reliability according to your internet connection. Smaller chunks can enhance success rates for unstable connections, while larger chunks speed up uploads for stable connections.",
+  "admin.config.share.auto-open-share-modal": "Auto open create share modal",
+  "admin.config.share.auto-open-share-modal.description":
+    "The share creation modal automatically appears when a user selects files, eliminating the need to manually click the button.",
+
   "admin.config.smtp.enabled": "Enabled",
   "admin.config.smtp.enabled.description":
     "Whether SMTP is enabled. Only set this to true if you entered the host, port, email, user and password of your SMTP server.",
@@ -450,6 +474,10 @@ export default {
   "admin.config.smtp.password": "Password",
   "admin.config.smtp.password.description": "Password of the SMTP server",
   "admin.config.smtp.button.test": "Send test email",
+  "admin.config.smtp.allow-unauthorized-certificates":
+    "Trust unauthorized SMTP server certificates",
+  "admin.config.smtp.allow-unauthorized-certificates.description":
+    "Only set this to true if you need to trust self signed certificates.",
 
   "admin.config.oauth.allow-registration": "Allow registration",
   "admin.config.oauth.allow-registration.description":
@@ -457,6 +485,9 @@ export default {
   "admin.config.oauth.ignore-totp": "Ignore TOTP",
   "admin.config.oauth.ignore-totp.description":
     "Whether to ignore TOTP when user using social login",
+  "admin.config.oauth.disable-password": "Disable password login",
+  "admin.config.oauth.disable-password.description":
+    "Whether to disable password login\nMake sure that an OAuth provider is properly configured before activating this configuration to avoid being locked out.",
   "admin.config.oauth.github-enabled": "GitHub",
   "admin.config.oauth.github-enabled.description":
     "Whether GitHub login is enabled",
@@ -508,6 +539,19 @@ export default {
   "admin.config.oauth.oidc-username-claim": "OpenID Connect username claim",
   "admin.config.oauth.oidc-username-claim.description":
     "Username claim in OpenID Connect ID token. Leave it blank if you don't know what this config is.",
+  "admin.config.oauth.oidc-role-path": "Path to roles in OpenID Connect token",
+  "admin.config.oauth.oidc-role-path.description":
+    "Must be a valid JMES path referencing an array of roles. " +
+    "Managing access rights using OpenID Connect roles is only recommended if no other identity provider is configured and password login is disabled. " +
+    "Leave it blank if you don't know what this config is.",
+  "admin.config.oauth.oidc-role-general-access": "OpenID Connect role for general access",
+  "admin.config.oauth.oidc-role-general-access.description":
+    "Role required for general access. Must be present in a user’s roles for them to log in. " +
+    "Leave it blank if you don't know what this config is.",
+  "admin.config.oauth.oidc-role-admin-access": "OpenID Connect role for admin access",
+  "admin.config.oauth.oidc-role-admin-access.description":
+    "Role required for administrative access. Must be present in a user’s roles for them to access the admin panel. " +
+    "Leave it blank if you don't know what this config is.",
   "admin.config.oauth.oidc-client-id": "OpenID Connect Client ID",
   "admin.config.oauth.oidc-client-id.description":
     "Client ID of the OpenID Connect OAuth app",
@@ -536,7 +580,7 @@ export default {
   "error.msg.not_linked": "This {0} account haven't linked to any account yet.",
   "error.msg.unverified_account":
     "This {0} account is unverified, please try again after verification.",
-  "error.msg.discord_guild_permission_denied":
+  "error.msg.user_not_allowed":
     "You are not allowed to sign in.",
   "error.msg.cannot_get_user_info":
     "Can not get your user info from this {0} account.",

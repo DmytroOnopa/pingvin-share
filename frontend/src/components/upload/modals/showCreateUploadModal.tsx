@@ -30,6 +30,7 @@ import shareService from "../../../services/share.service";
 import { FileUpload } from "../../../types/File.type";
 import { CreateShare } from "../../../types/share.type";
 import { getExpirationPreview } from "../../../utils/date.util";
+import React from "react";
 
 const showCreateUploadModal = (
   modals: ModalsContextProps,
@@ -92,11 +93,16 @@ const CreateUploadModalBody = ({
       .matches(new RegExp("^[a-zA-Z0-9_-]*$"), {
         message: t("upload.modal.link.error.invalid"),
       }),
+    name: yup
+      .string()
+      .transform((value) => value || undefined)
+      .min(3, t("common.error.too-short", { length: 3 }))
+      .max(30, t("common.error.too-long", { length: 30 })),
     password: yup
       .string()
       .transform((value) => value || undefined)
-      .min(3)
-      .max(30),
+      .min(3, t("common.error.too-short", { length: 3 }))
+      .max(30, t("common.error.too-long", { length: 30 })),
     maxViews: yup
       .number()
       .transform((value) => value || undefined)
@@ -105,6 +111,7 @@ const CreateUploadModalBody = ({
 
   const form = useForm({
     initialValues: {
+      name: undefined,
       link: generatedLink,
       recipients: [] as string[],
       password: undefined,
@@ -154,6 +161,7 @@ const CreateUploadModalBody = ({
       uploadCallback(
         {
           id: values.link,
+          name: values.name,
           expiration: expirationString,
           recipients: values.recipients,
           description: values.description,
@@ -235,7 +243,6 @@ const CreateUploadModalBody = ({
                     disabled={form.values.never_expires}
                     {...form.getInputProps("expiration_unit")}
                     data={[
-                      // Set the label to singular if the number is 1, else plural
                       {
                         value: "-minutes",
                         label:
@@ -308,14 +315,21 @@ const CreateUploadModalBody = ({
           <Accordion>
             <Accordion.Item value="description" sx={{ borderBottom: "none" }}>
               <Accordion.Control>
-                <FormattedMessage id="upload.modal.accordion.description.title" />
+                <FormattedMessage id="upload.modal.accordion.name-and-description.title" />
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack align="stretch">
+                  <TextInput
+                    variant="filled"
+                    placeholder={t(
+                      "upload.modal.accordion.name-and-description.name.placeholder",
+                    )}
+                    {...form.getInputProps("name")}
+                  />
                   <Textarea
                     variant="filled"
                     placeholder={t(
-                      "upload.modal.accordion.description.placeholder",
+                      "upload.modal.accordion.name-and-description.description.placeholder",
                     )}
                     {...form.getInputProps("description")}
                   />
@@ -333,7 +347,9 @@ const CreateUploadModalBody = ({
                     placeholder={t("upload.modal.accordion.email.placeholder")}
                     searchable
                     creatable
-                    autoComplete="email-recipients"
+                    id="recipient_email"
+                    autoComplete="email"
+                    type="email"
                     getCreateLabel={(query) => `+ ${query}`}
                     onCreate={(query) => {
                       if (!query.match(/^\S+@\S+\.\S+$/)) {
@@ -351,6 +367,25 @@ const CreateUploadModalBody = ({
                       }
                     }}
                     {...form.getInputProps("recipients")}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                      // Add email on comma or semicolon
+                      if (e.key === "," || e.key === ";") {
+                        e.preventDefault();
+                        const inputValue = (
+                          e.target as HTMLInputElement
+                        ).value.trim();
+                        if (inputValue.match(/^\S+@\S+\.\S+$/)) {
+                          form.setFieldValue("recipients", [
+                            ...form.values.recipients,
+                            inputValue,
+                          ]);
+                          (e.target as HTMLInputElement).value = "";
+                        }
+                      } else if (e.key === " ") {
+                        e.preventDefault();
+                        (e.target as HTMLInputElement).value = "";
+                      }
+                    }}
                   />
                 </Accordion.Panel>
               </Accordion.Item>

@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, JwtSignOptions } from "@nestjs/jwt";
 import { Share, User } from "@prisma/client";
 import * as archiver from "archiver";
 import * as argon from "argon2";
@@ -46,9 +46,8 @@ export class ShareService {
     let expirationDate: Date;
 
     // If share is created by a reverse share token override the expiration date
-    const reverseShare = await this.reverseShareService.getByToken(
-      reverseShareToken,
-    );
+    const reverseShare =
+      await this.reverseShareService.getByToken(reverseShareToken);
     if (reverseShare) {
       expirationDate = reverseShare.shareExpiration;
     } else {
@@ -194,6 +193,22 @@ export class ShareService {
     });
   }
 
+  async getShares() {
+    const shares = await this.prisma.share.findMany({
+      orderBy: {
+        expiration: "desc",
+      },
+      include: { files: true, creator: true },
+    });
+
+    return shares.map((share) => {
+      return {
+        ...share,
+        size: share.files.reduce((acc, file) => acc + parseInt(file.size), 0),
+      };
+    });
+  }
+
   async getSharesByUser(userId: string) {
     const shares = await this.prisma.share.findMany({
       where: {
@@ -214,6 +229,7 @@ export class ShareService {
     return shares.map((share) => {
       return {
         ...share,
+        size: share.files.reduce((acc, file) => acc + parseInt(file.size), 0),
         recipients: share.recipients.map((recipients) => recipients.email),
       };
     });
@@ -251,13 +267,14 @@ export class ShareService {
     return share;
   }
 
-  async remove(shareId: string) {
+  async remove(shareId: string, isDeleterAdmin = false) {
     const share = await this.prisma.share.findUnique({
       where: { id: shareId },
     });
 
     if (!share) throw new NotFoundException("Share not found");
-    if (!share.creatorId)
+
+    if (!share.creatorId && !isDeleterAdmin)
       throw new ForbiddenException("Anonymous shares can't be deleted");
 
     await this.fileService.deleteAllFiles(shareId);
@@ -311,15 +328,21 @@ export class ShareService {
     const { expiration } = await this.prisma.share.findUnique({
       where: { id: shareId },
     });
-    return this.jwtService.sign(
-      {
-        shareId,
-      },
-      {
-        expiresIn: moment(expiration).diff(new Date(), "seconds") + "s",
-        secret: this.config.get("internal.jwtSecret"),
-      },
-    );
+
+    const tokenPayload = {
+      shareId,
+      iat: moment().unix(),
+    };
+
+    const tokenOptions: JwtSignOptions = {
+      secret: this.config.get("internal.jwtSecret"),
+    };
+
+    if (!moment(expiration).isSame(0)) {
+      tokenOptions.expiresIn = moment(expiration).diff(new Date(), "seconds");
+    }
+
+    return this.jwtService.sign(tokenPayload, tokenOptions);
   }
 
   async verifyShareToken(shareId: string, token: string) {
